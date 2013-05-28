@@ -52,6 +52,10 @@
 #include "quartz/gdkquartz.h"
 #endif
 
+#ifdef GDK_WINDOWING_DIRECTFB
+#include "directfb/gdkdirectfb.h"
+#endif
+
 #ifdef G_OS_WIN32
 #include "gtkwin32themeprivate.h"
 #endif
@@ -2802,6 +2806,11 @@ settings_update_cursor_theme (GtkSettings *settings)
 #ifdef GDK_WINDOWING_WAYLAND
   if (GDK_IS_WAYLAND_DISPLAY (display))
     gdk_wayland_display_set_cursor_theme (display, theme, size);
+  else
+#endif
+#ifdef GDK_WINDOWING_DIRECTFB
+  if (GDK_IS_DIRECTFB_DISPLAY (display))
+    gdk_directfb_display_set_cursor_theme (display, theme, size);
   else
 #endif
     g_warning ("GtkSettings Cursor Theme: Unsupported GDK backend\n");

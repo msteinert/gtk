@@ -51,6 +51,10 @@
 #include "broadway/gdkprivate-broadway.h"
 #endif
 
+#ifdef GDK_WINDOWING_DIRECTFB
+#include "directfb/gdkprivate-directfb.h"
+#endif
+
 #ifdef GDK_WINDOWING_WIN32
 #include "win32/gdkwin32.h"
 #include "win32/gdkprivate-win32.h"
@@ -237,8 +241,8 @@ static const gchar *allowed_backends;
  * that are specified by this function.
  *
  * The possible backend names are x11, win32, quartz,
- * broadway, wayland. You can also include a * in the
- * list to try all remaining backends.
+ * broadway, wayland, directfb. You can also include
+ * a * in the list to try all remaining backends.
  *
  * This call must happen prior to gdk_display_open(),
  * gtk_init(), gtk_init_with_args() or gtk_init_check()
@@ -274,6 +278,9 @@ static GdkBackend gdk_backends[] = {
 #endif
 #ifdef GDK_WINDOWING_BROADWAY
   { "broadway", _gdk_broadway_display_open },
+#endif
+#ifdef GDK_WINDOWING_DIRECTFB
+  { "directfb", _gdk_directfb_display_open },
 #endif
   /* NULL-terminating this array so we can use commas above */
   { NULL, NULL }

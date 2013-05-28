@@ -322,6 +322,10 @@ AC_ARG_ENABLE(wayland-backend,
               [AS_HELP_STRING([--enable-wayland-backend],
                               [enable the wayland gdk backend])],
 			      [backend_set=yes])
+AC_ARG_ENABLE(directfb-backend,
+              [AS_HELP_STRING([--enable-directfb-backend],
+                              [enable the DirectFB gdk backend])],
+			      [backend_set=yes])
 
 if test -z "$backend_set"; then
   if test "$platform_win32" = yes; then
@@ -448,6 +452,18 @@ if test "$enable_wayland_backend" = "yes"; then
   AM_CONDITIONAL(USE_WAYLAND, true)
 else
   AM_CONDITIONAL(USE_WAYLAND, false)
+fi
+
+if test "x$enable_directfb_backend" = "xyes"; then
+  cairo_backends="$cairo_backends cairo-directfb"
+  GDK_BACKENDS="$GDK_BACKENDS directfb"
+  have_gio_unix=yes
+  GDK_WINDOWING="$GDK_WINDOWING
+#define GDK_WINDOWING_DIRECTFB"
+  DIRECTFB_PACKAGES="directfb >= 1.2"
+  AM_CONDITIONAL(USE_DIRECTFB, true)
+else
+  AM_CONDITIONAL(USE_DIRECTFB, false)
 fi
 
 # strip leading space
@@ -1278,34 +1294,6 @@ else
   GDK_GIO_PACKAGE="gio-2.0 >= glib_required_version"
 fi
 
-# Check for Pango flags
-
-AC_MSG_CHECKING(Pango flags)
-if $PKG_CONFIG --exists $PANGO_PACKAGES ; then
-        PANGO_CFLAGS=`$PKG_CONFIG --cflags $PANGO_PACKAGES`
-        PANGO_LIBS=`$PKG_CONFIG --libs $PANGO_PACKAGES`
-
-        AC_MSG_RESULT($PANGO_CFLAGS $PANGO_LIBS)
-else
-        AC_MSG_ERROR([
-*** Pango not found. Pango built with Cairo support is required
-*** to build GTK+. See http://www.pango.org for Pango information.
-])
-fi
-
-CFLAGS="$CFLAGS $PANGO_CFLAGS"
-
-if $PKG_CONFIG --uninstalled $PANGO_PACKAGES; then
-        :
-else
-	gtk_save_LIBS="$LIBS"
-        LIBS="$PANGO_LIBS $LIBS"
-        AC_TRY_LINK_FUNC(pango_context_new, :, AC_MSG_ERROR([
-*** Can't link to Pango. Pango is required to build
-*** GTK+. For more information see http://www.pango.org]))
-        LIBS="$gtk_save_LIBS"
-fi
-
 # Check for cairo_set_device_scale, as we don't want to depend hard on
 # this until there is a stable release with it
 CAIRO_CFLAGS=`$PKG_CONFIG --cflags cairo`
@@ -1321,7 +1309,7 @@ CFLAGS="$saved_cflags"
 LDFLAGS="$saved_ldflags"
 
 GDK_PACKAGES="$PANGO_PACKAGES gdk-pixbuf-2.0 >= gdk_pixbuf_required_version cairo >= cairo_required_version cairo-gobject >= cairo_required_version"
-GDK_PRIVATE_PACKAGES="$GDK_GIO_PACKAGE $X_PACKAGES $WAYLAND_PACKAGES $cairo_backends"
+GDK_PRIVATE_PACKAGES="$GDK_GIO_PACKAGE $X_PACKAGES $WAYLAND_PACKAGES $DIRECTFB_PACKAGES $cairo_backends"
 if test "x$enable_x11_backend" = xyes; then
   GDK_PRIVATE_PACKAGES="$GDK_PRIVATE_PACKAGES pangoft2"
 fi
@@ -1875,6 +1863,7 @@ build/win32/vs9/Makefile
 build/win32/vs10/Makefile
 gdk/Makefile
 gdk/broadway/Makefile
+gdk/directfb/Makefile
 gdk/x11/Makefile
 gdk/win32/Makefile
 gdk/win32/rc/Makefile

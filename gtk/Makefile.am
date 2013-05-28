@@ -1052,15 +1052,30 @@ endif
 endif
 endif
 
+if USE_X11
+gtk_clipboard_dnd_c_sources = 	\
+	gtkclipboard.c \
+	gtkclipboard-wayland.c \
+	gtkdnd.c
+endif
+
 if USE_QUARTZ
 gtk_clipboard_dnd_c_sources = 	\
 	gtkclipboard-quartz.c	\
 	gtkdnd-quartz.c
-else
+endif
+
+if USE_WAYLAND
 # No wayland gtkdnd-wayland.c yet
 gtk_clipboard_dnd_c_sources = 	\
 	gtkclipboard.c \
 	gtkclipboard-wayland.c \
+	gtkdnd.c
+endif
+
+if USE_DIRECTFB
+gtk_clipboard_dnd_c_sources =	\
+	gtkclipboard.c		\
 	gtkdnd.c
 endif
 

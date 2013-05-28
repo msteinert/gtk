@@ -13,7 +13,7 @@ INTROSPECTION_COMPILER_ARGS = \
 
 SUBDIRS = $(GDK_BACKENDS) .
 
-DIST_SUBDIRS = win32 x11 quartz broadway wayland
+DIST_SUBDIRS = win32 x11 quartz broadway wayland directfb
 
 CLEANFILES =
 
@@ -191,6 +191,10 @@ endif # USE_BROADWAY
 
 if USE_WAYLAND
 libgdk_3_la_LIBADD += wayland/libgdk-wayland.la
+endif
+
+if USE_DIRECTFB
+libgdk_3_la_LIBADD += directfb/libgdk-directfb.la
 endif
 
 if HAVE_INTROSPECTION
